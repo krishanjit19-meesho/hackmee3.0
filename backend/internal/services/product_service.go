@@ -7,18 +7,21 @@ import (
 	"strings"
 	"time"
 
+	"meesho-clone/configs"
 	"meesho-clone/internal/models"
+
+	"gorm.io/gorm"
 )
 
 // ProductService handles product-related operations
 type ProductService struct {
-	databricksService *DatabricksService
+	db *gorm.DB
 }
 
 // NewProductService creates a new product service
-func NewProductService(databricksService *DatabricksService) *ProductService {
+func NewProductService() *ProductService {
 	return &ProductService{
-		databricksService: databricksService,
+		db: configs.DB,
 	}
 }
 
@@ -26,39 +29,38 @@ func NewProductService(databricksService *DatabricksService) *ProductService {
 func (s *ProductService) GetProductDetails(productID, userID string) (*models.ProductDetailsResponse, error) {
 	startTime := time.Now()
 
-	// Try to get product details from Databricks first
-	if s.databricksService != nil {
-		productDetails, err := s.getProductDetailsFromDatabricks(productID)
-		if err == nil && productDetails != nil {
-			// Add mock data for fields not in Databricks
-			s.enrichProductDetails(productDetails, productID, userID)
+	// Try to get product details from product_info table
+	productDetails, err := s.getProductDetailsFromDatabase(productID)
+	if err == nil && productDetails != nil {
+		// Add mock data for fields not in product_info table
+		s.enrichProductDetails(productDetails, productID, userID)
 
-			responseTime := time.Since(startTime).Milliseconds()
-			return &models.ProductDetailsResponse{
-				Success: true,
-				Message: "Product details retrieved successfully",
-				Data:    *productDetails,
-				Meta: models.ProductMeta{
-					ProductID:    productID,
-					UserID:       userID,
-					GeneratedAt:  time.Now(),
-					Source:       "Databricks",
-					CacheHit:     false,
-					ResponseTime: responseTime,
-				},
-			}, nil
-		}
-		log.Printf("Failed to get product details from Databricks: %v", err)
+		responseTime := time.Since(startTime).Milliseconds()
+		return &models.ProductDetailsResponse{
+			Success: true,
+			Message: "Product details retrieved successfully",
+			Data:    *productDetails,
+			Meta: models.ProductMeta{
+				ProductID:    productID,
+				UserID:       userID,
+				GeneratedAt:  time.Now(),
+				Source:       "product_info_table",
+				CacheHit:     false,
+				ResponseTime: responseTime,
+			},
+		}, nil
 	}
 
+	log.Printf("Failed to get product details from database: %v", err)
+
 	// Fall back to mock data
-	productDetails := s.generateMockProductDetails(productID, userID)
+	mockProductDetails := s.generateMockProductDetails(productID, userID)
 	responseTime := time.Since(startTime).Milliseconds()
 
 	return &models.ProductDetailsResponse{
 		Success: true,
 		Message: "Product details retrieved successfully (mock data)",
-		Data:    productDetails,
+		Data:    mockProductDetails,
 		Meta: models.ProductMeta{
 			ProductID:    productID,
 			UserID:       userID,
@@ -70,57 +72,93 @@ func (s *ProductService) GetProductDetails(productID, userID string) (*models.Pr
 	}, nil
 }
 
-// getProductDetailsFromDatabricks retrieves product details from Databricks
-func (s *ProductService) getProductDetailsFromDatabricks(productID string) (*models.ProductDetails, error) {
-	// Query Databricks for product details
-	query := `
-		SELECT 
-			p.product_id,
-			p.catalog_id,
-			p.scat as category,
-			p.sscat as sub_category,
-			sp.image_url,
-			COALESCE(ca.price_sscat_decile, '₹999') as price
-		FROM gold.product_info p
-		LEFT JOIN silver.supply__products sp ON p.product_id = sp.product_id
-		LEFT JOIN catalog__attributes_agg ca ON p.catalog_id = ca.catalog_id
-		WHERE p.product_id = ?
-		LIMIT 1
-	`
+// getProductDetailsFromDatabase retrieves product details from product_info table
+func (s *ProductService) getProductDetailsFromDatabase(productID string) (*models.ProductDetails, error) {
+	var productInfo models.ProductInfo
 
-	rows, err := s.databricksService.db.Query(query, productID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to query Databricks: %w", err)
+	// Query product_info table for the product
+	result := s.db.Where("product_id = ?", productID).First(&productInfo)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to query product_info table: %w", result.Error)
 	}
-	defer rows.Close()
 
-	if rows.Next() {
-		var product models.ProductDetails
-		var imageURL string
-		var price string
+	log.Printf("Found product in database: %s", productInfo.ProductID)
 
-		err := rows.Scan(
-			&product.ProductID,
-			&product.CatalogID,
-			&product.Category,
-			&product.SubCategory,
-			&imageURL,
-			&price,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("failed to scan product data: %w", err)
+	// Convert ProductInfo to ProductDetails
+	productDetails := s.convertProductInfoToProductDetails(productInfo)
+
+	return &productDetails, nil
+}
+
+// convertProductInfoToProductDetails converts ProductInfo to ProductDetails
+func (s *ProductService) convertProductInfoToProductDetails(productInfo models.ProductInfo) models.ProductDetails {
+	// Generate image URL from the images field or catalog_id
+	imageURL := s.generateImageURL(productInfo.CatalogID, productInfo.Images)
+
+	// Use the name field as title, fallback to category + subcategory
+	title := productInfo.Name
+	if title == "" {
+		title = fmt.Sprintf("%s - %s", productInfo.Category, productInfo.Sscat)
+	}
+
+	// Generate price based on product info
+	price := s.generatePriceFromProductInfo(productInfo)
+
+	// Generate basic images array
+	images := []string{imageURL}
+
+	return models.ProductDetails{
+		ProductID:   productInfo.ProductID,
+		CatalogID:   productInfo.CatalogID,
+		Title:       title,
+		Category:    productInfo.Category,
+		SubCategory: productInfo.Sscat,
+		Price:       price,
+		MainImage:   imageURL,
+		Images:      images,
+		Brand:       productInfo.BrandName,
+		Description: fmt.Sprintf("High-quality %s %s. Perfect for your needs with excellent durability and style.",
+			strings.ToLower(productInfo.Category), strings.ToLower(productInfo.Sscat)),
+	}
+}
+
+// generateImageURL generates image URL from catalog_id and images field
+func (s *ProductService) generateImageURL(catalogID, images string) string {
+	// If images field has data, use it
+	if images != "" {
+		// You might need to parse the images field based on your data format
+		// For now, assuming it's a direct URL or needs to be prefixed
+		if len(images) > 0 && images[:4] == "http" {
+			return images
 		}
-
-		// Set basic fields
-		product.Title = fmt.Sprintf("%s - %s", product.Category, product.SubCategory)
-		product.Price = price
-		product.MainImage = fmt.Sprintf("https://images.meesho.com%s", imageURL)
-		product.Images = []string{product.MainImage}
-
-		return &product, nil
+		// If it's a relative path, prefix with Meesho CDN
+		return fmt.Sprintf("https://images.meesho.com%s", images)
 	}
 
-	return nil, fmt.Errorf("product not found: %s", productID)
+	// Fallback to generating URL from catalog_id
+	return fmt.Sprintf("https://images.meesho.com/images/products/%s/1_256.jpg", catalogID)
+}
+
+// generatePriceFromProductInfo generates price based on product info
+func (s *ProductService) generatePriceFromProductInfo(productInfo models.ProductInfo) string {
+	// You can implement price generation logic based on:
+	// - Category (different categories have different price ranges)
+	// - Brand (branded vs non-branded)
+	// - Scale (large vs small scale)
+	// - Other fields in the product_info table
+
+	// For now, generating a basic price based on catalog_id
+	// In a real implementation, you might want to add a price field to the table
+	// or implement a pricing algorithm based on the available fields
+
+	// Simple hash-based price generation
+	price := 0
+	for _, char := range productInfo.CatalogID {
+		price += int(char)
+	}
+	price = (price % 4500) + 500 // Price between 500-5000
+
+	return fmt.Sprintf("₹%d", price)
 }
 
 // enrichProductDetails adds mock data to enrich the product details
@@ -135,13 +173,17 @@ func (s *ProductService) enrichProductDetails(product *models.ProductDetails, pr
 	product.DiscountPercent = discountPercent
 
 	// Generate mock data for other fields
-	product.Description = fmt.Sprintf("High-quality %s %s. Perfect for your needs with excellent durability and style.",
-		strings.ToLower(product.Category), strings.ToLower(product.SubCategory))
+	if product.Description == "" {
+		product.Description = fmt.Sprintf("High-quality %s %s. Perfect for your needs with excellent durability and style.",
+			strings.ToLower(product.Category), strings.ToLower(product.SubCategory))
+	}
 
 	product.Rating = 3.5 + rand.Float64()*1.5 // 3.5 to 5.0
 	product.Reviews = rand.Intn(10000) + 100
 	product.Stock = rand.Intn(50) + 10
-	product.Brand = "Meesho Brand"
+	if product.Brand == "" {
+		product.Brand = "Meesho Brand"
+	}
 	product.Seller = "Meesho Seller"
 	product.DeliveryInfo = "Free delivery by tomorrow"
 	product.ReturnPolicy = "7 days return policy"

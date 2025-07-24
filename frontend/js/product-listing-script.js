@@ -8,6 +8,14 @@ class ProductListing {
             category: 'all',
             price: 'all'
         };
+        // Constants for page titles
+        this.PAGE_TITLES = {
+            DEFAULT: 'Special Offers',
+            CATALOG: 'Catalog Products',
+            SEARCH: 'Search Results',
+            CATEGORY: 'Category Products',
+            FEATURED: 'Featured Products'
+        };
         this.init();
     }
 
@@ -78,14 +86,17 @@ class ProductListing {
                 } else {
                     console.warn('No catalog data available, using mock data');
                     this.loadMockProducts();
+                    this.setPageTitle(this.PAGE_TITLES.DEFAULT);
                 }
             } else {
                 console.warn('No catalog data in localStorage, using mock data');
                 this.loadMockProducts();
+                this.setPageTitle(this.PAGE_TITLES.DEFAULT);
             }
         } catch (error) {
             console.error('Error loading catalog data:', error);
             this.loadMockProducts();
+            this.setPageTitle(this.PAGE_TITLES.DEFAULT);
         }
 
         this.filteredProducts = [...this.products];
@@ -94,11 +105,14 @@ class ProductListing {
     }
 
     updatePageTitle(catalogData) {
-        const pageTitle = document.querySelector('.page-title');
-        if (pageTitle && catalogData.meta) {
-            const totalProducts = catalogData.meta.total_products || this.products.length;
-            const source = catalogData.meta.source || 'Catalog';
-            pageTitle.textContent = `${source} Products (${totalProducts})`;
+        // Always use "Special Offers" regardless of data source
+        this.setPageTitle(this.PAGE_TITLES.DEFAULT);
+    }
+
+    setPageTitle(title) {
+        const pageTitle = document.getElementById('pageTitle');
+        if (pageTitle) {
+            pageTitle.textContent = title;
         }
     }
 
@@ -133,88 +147,76 @@ class ProductListing {
         // Mock product data similar to Meesho style (fallback)
         this.products = [
             {
-                id: 's-532528444',
-                title: 'Graceful Artificial Plant, Flower and Decorative Item for Home',
-                currentPrice: 163,
-                originalPrice: 175,
-                discount: '7% off',
-                specialOffer: '₹147 with 1 Special Offer',
+                id: 's-375061729',
+                title: 'Trendy Retro Men Shirts',
+                currentPrice: 109,
+                originalPrice: 199,
+                discount: '45% off',
+                specialOffer: '₹84 with 2 Special Offers',
                 delivery: 'Free Delivery',
-                rating: 3.8,
-                reviews: 444,
-                image: '../assets/icon.png',
-                category: 'Home & Garden',
-                isTrusted: false
+                rating: 4.0,
+                reviews: 46686,
+                image: '../assets/icon.png'
             },
             {
-                id: 's-541804123',
-                title: 'New Collections Of Planter Stand',
-                currentPrice: 488,
-                originalPrice: 541,
-                discount: '10% off',
-                specialOffer: '₹408 with 2 Special Offers',
+                id: 's-510539001',
+                title: 'Selfie Sticks',
+                currentPrice: 187,
+                originalPrice: 299,
+                discount: '37% off',
+                specialOffer: '₹163 with 1 Special Offer',
                 delivery: 'Free Delivery',
-                rating: 3.9,
-                reviews: 586,
-                image: '../assets/icon.png',
-                category: 'Home & Garden',
-                isTrusted: true
+                rating: 4.1,
+                reviews: 16237,
+                image: '../assets/icon.png'
             },
             {
-                id: 's-394453979',
-                title: 'Unique Artificial Plant, Flower and Decorative Item',
-                currentPrice: 539,
-                originalPrice: 579,
-                discount: '7% off',
-                specialOffer: '₹484 with 2 Special Offers',
+                id: 's-191005349',
+                title: 'Chitrarekha Attractive Kurtis',
+                currentPrice: 184,
+                originalPrice: 399,
+                discount: '54% off',
+                specialOffer: '₹165 with 3 Special Offers',
+                delivery: 'Free Delivery',
+                rating: 4.2,
+                reviews: 8923,
+                image: '../assets/icon.png'
+            },
+            {
+                id: 's-507286436',
+                title: 'Urbane Graceful Women Tops & T-Shirts',
+                currentPrice: 292,
+                originalPrice: 599,
+                discount: '51% off',
+                specialOffer: '₹263 with 2 Special Offers',
                 delivery: 'Free Delivery',
                 rating: 4.3,
-                reviews: 6317,
-                image: '../assets/icon.png',
-                category: 'Home & Garden',
-                isTrusted: false
-            },
-            {
-                id: 's-388338864',
-                title: 'Attractive Artificial Plant, Flower and Decorative Item',
-                currentPrice: 281,
-                originalPrice: 301,
-                discount: '7% off',
-                specialOffer: '₹260 with 2 Special Offers',
-                delivery: 'Free Delivery',
-                rating: 4.4,
-                reviews: 3485,
-                image: '../assets/icon.png',
-                category: 'Home & Garden',
-                isTrusted: false
+                reviews: 15432,
+                image: '../assets/icon.png'
             },
             {
                 id: 's-123456789',
-                title: 'Premium Artificial Bonsai Tree for Office Decoration',
-                currentPrice: 899,
-                originalPrice: 1299,
-                discount: '31% off',
-                specialOffer: '₹799 with 3 Special Offers',
+                title: 'Stylish Men Casual Shirts',
+                currentPrice: 199,
+                originalPrice: 399,
+                discount: '50% off',
+                specialOffer: '₹179 with 1 Special Offer',
                 delivery: 'Free Delivery',
-                rating: 4.6,
-                reviews: 892,
-                image: '../assets/icon.png',
-                category: 'Home & Garden',
-                isTrusted: true
+                rating: 4.4,
+                reviews: 23456,
+                image: '../assets/icon.png'
             },
             {
                 id: 's-987654321',
-                title: 'Modern Hanging Plant Pot with Chain',
-                currentPrice: 245,
-                originalPrice: 345,
-                discount: '29% off',
-                specialOffer: '₹220 with 1 Special Offer',
+                title: 'Elegant Women Kurtis Collection',
+                currentPrice: 249,
+                originalPrice: 499,
+                discount: '50% off',
+                specialOffer: '₹224 with 2 Special Offers',
                 delivery: 'Free Delivery',
                 rating: 4.1,
-                reviews: 1234,
-                image: '../assets/icon.png',
-                category: 'Home & Garden',
-                isTrusted: false
+                reviews: 18765,
+                image: '../assets/icon.png'
             }
         ];
     }
@@ -226,19 +228,10 @@ class ProductListing {
         container.innerHTML = this.filteredProducts.map(product => `
             <div class="product-card" data-product-id="${product.id}">
                 <div class="wishlist-heart">♡</div>
-                <img src="${product.image}" alt="${product.title}" class="product-image" onerror="this.src='../assets/icon.png'">
-                
-                <div class="product-header">
-                    <div class="delivery-tag">${product.delivery}</div>
-                    <div class="rating-section">
-                        <span class="rating-stars">★</span>
-                        <span>${product.rating}</span>
-                        ${product.isTrusted ? '<span class="trusted-badge">m Trusted</span>' : ''}
-                    </div>
+                <div class="product-image-container">
+                    <img src="${product.image}" alt="${product.title}" class="product-image" onerror="this.src='../assets/icon.png'">
                 </div>
                 
-                ${product.catalogId ? `<div class="catalog-id">Catalog: ${product.catalogId}</div>` : ''}
-                <div class="product-id">${product.id}</div>
                 <div class="product-title">${product.title}</div>
                 
                 <div class="product-price">
@@ -247,20 +240,12 @@ class ProductListing {
                     <span class="discount">${product.discount}</span>
                 </div>
                 
-                ${product.price ? `<div class="catalog-price">Catalog Price: ${product.price}</div>` : ''}
                 <div class="special-offer">${product.specialOffer}</div>
                 <div class="delivery-info">${product.delivery}</div>
                 
-                ${product.category && product.subCategory ? `
-                    <div class="product-categories">
-                        <span class="category-tag">${product.category}</span>
-                        <span class="subcategory-tag">${product.subCategory}</span>
-                    </div>
-                ` : ''}
-                
                 <div class="product-rating">
-                    <span class="rating-stars">★★★★☆</span>
-                    <span>(${product.reviews.toLocaleString()})</span>
+                    <span class="rating-stars">★</span>
+                    <span>${product.rating} (${product.reviews.toLocaleString()})</span>
                 </div>
             </div>
         `).join('');

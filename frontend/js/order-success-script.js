@@ -13,11 +13,18 @@ class OrderSuccess {
     }
 
     setupEventListeners() {
-        // Back button
-        const backBtn = document.getElementById('backBtn');
-        if (backBtn) {
-            backBtn.addEventListener('click', () => {
-                window.history.back();
+        // Home button
+        const homeBtn = document.getElementById('homeBtn');
+        if (homeBtn) {
+            homeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.goHome();
+            });
+            
+            // Also add touch event for mobile
+            homeBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                this.goHome();
             });
         }
 
@@ -205,6 +212,11 @@ class OrderSuccess {
 
     continueShopping() {
         // Navigate back to home page
+        window.location.href = 'home.html';
+    }
+
+    goHome() {
+        // Navigate to home page
         window.location.href = 'home.html';
     }
 

@@ -17,34 +17,39 @@ class ProductDetails {
     }
 
     setupEventListeners() {
-        // Back button
+                // Back button
         const backBtn = document.getElementById('backBtn');
+        console.log('Back button found:', !!backBtn);
         if (backBtn) {
-            backBtn.addEventListener('click', () => {
+            backBtn.addEventListener('click', (e) => {
+                console.log('Back button clicked!');
+                e.preventDefault();
+                this.goBack();
+            });
+            
+            // Also add touch event for mobile
+            backBtn.addEventListener('touchend', (e) => {
+                console.log('Back button touched!');
+                e.preventDefault();
                 this.goBack();
             });
         }
 
-        // Header buttons
-        const searchBtn = document.querySelector('.search-btn');
-        const wishlistBtn = document.querySelector('.wishlist-btn');
+        // Cart button
         const cartBtn = document.querySelector('.cart-btn');
-        
-        if (searchBtn) {
-            searchBtn.addEventListener('click', () => {
-                alert('Search feature coming soon!');
-            });
-        }
-        
-        if (wishlistBtn) {
-            wishlistBtn.addEventListener('click', () => {
-                this.toggleWishlist();
-            });
-        }
-        
+        console.log('Cart button found:', !!cartBtn);
         if (cartBtn) {
-            cartBtn.addEventListener('click', () => {
-                alert('Cart feature coming soon!');
+            cartBtn.addEventListener('click', (e) => {
+                console.log('Cart button clicked!');
+                e.preventDefault();
+                this.openCart();
+            });
+            
+            // Also add touch event for mobile
+            cartBtn.addEventListener('touchend', (e) => {
+                console.log('Cart button touched!');
+                e.preventDefault();
+                this.openCart();
             });
         }
 
@@ -463,9 +468,8 @@ class ProductDetails {
     }
 
     buyNow() {
-        // Redirect to order success page with order details
-        const orderId = this.generateOrderId();
-        window.location.href = `order-success.html?orderId=${orderId}&productId=${this.productData.id}`;
+        // Redirect directly to order success page
+        window.location.href = `order-success.html?productId=${this.productData.id}&quantity=1`;
     }
 
     generateOrderId() {
@@ -507,10 +511,17 @@ class ProductDetails {
         if (referrer && referrer.includes('product-listing.html')) {
             // Go back to product listing page
             window.location.href = 'product-listing.html';
+        } else if (referrer && referrer.includes('home.html')) {
+            // Go back to home page
+            window.location.href = 'home.html';
         } else {
             // Default fallback - go back in history
             window.history.back();
         }
+    }
+
+    openCart() {
+        alert('Cart Feature:\n\n• 2 items in cart\n• Total: ₹326\n• Free delivery available\n\nCart page coming soon!');
     }
 
     addTouchFeedback() {

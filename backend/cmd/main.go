@@ -35,15 +35,7 @@ func main() {
 
 	// Initialize services
 	userService := services.NewUserService()
-
-	// Initialize Databricks service for product details
-	databricksService, err := services.NewDatabricksService()
-	if err != nil {
-		log.Printf("Warning: Failed to initialize Databricks service: %v", err)
-		databricksService = nil
-	}
-
-	productService := services.NewProductService(databricksService)
+	productService := services.NewProductService()
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler()
