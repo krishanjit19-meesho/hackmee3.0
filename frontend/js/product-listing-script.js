@@ -61,10 +61,76 @@ class ProductListing {
     async loadProducts() {
         this.showLoading(true);
         
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock product data similar to Meesho style
+        try {
+            // Get catalog data from localStorage (set by home page)
+            const catalogDataString = localStorage.getItem('catalogData');
+            
+            if (catalogDataString) {
+                const catalogData = JSON.parse(catalogDataString);
+                
+                if (catalogData.success && catalogData.data && catalogData.data.length > 0) {
+                    // Convert backend catalog data to product format
+                    this.products = this.convertCatalogToProducts(catalogData.data);
+                    console.log('Loaded catalog data from backend:', catalogData);
+                    
+                    // Update page title to show catalog information
+                    this.updatePageTitle(catalogData);
+                } else {
+                    console.warn('No catalog data available, using mock data');
+                    this.loadMockProducts();
+                }
+            } else {
+                console.warn('No catalog data in localStorage, using mock data');
+                this.loadMockProducts();
+            }
+        } catch (error) {
+            console.error('Error loading catalog data:', error);
+            this.loadMockProducts();
+        }
+
+        this.filteredProducts = [...this.products];
+        this.displayProducts();
+        this.showLoading(false);
+    }
+
+    updatePageTitle(catalogData) {
+        const pageTitle = document.querySelector('.page-title');
+        if (pageTitle && catalogData.meta) {
+            const totalProducts = catalogData.meta.total_products || this.products.length;
+            const source = catalogData.meta.source || 'Catalog';
+            pageTitle.textContent = `${source} Products (${totalProducts})`;
+        }
+    }
+
+    convertCatalogToProducts(catalogData) {
+        return catalogData.map((item, index) => {
+            // Generate random price data for demo (in real app, this would come from backend)
+            const currentPrice = Math.floor(Math.random() * 500) + 100;
+            const originalPrice = Math.floor(currentPrice * (1 + Math.random() * 0.5));
+            const discount = Math.floor(((originalPrice - currentPrice) / originalPrice) * 100);
+            
+            return {
+                id: item.product_id || `catalog-${index}`,
+                title: item.title || `${item.category} - ${item.sub_category}`,
+                currentPrice: currentPrice,
+                originalPrice: Math.floor(originalPrice),
+                discount: `${discount}% off`,
+                specialOffer: `₹${Math.floor(currentPrice * 0.9)} with ${Math.floor(Math.random() * 3) + 1} Special Offers`,
+                delivery: 'Free Delivery',
+                rating: (Math.random() * 2 + 3).toFixed(1), // Random rating between 3-5
+                reviews: Math.floor(Math.random() * 50000) + 1000,
+                image: item.image_url || '../assets/icon.png',
+                category: item.category || 'General',
+                subCategory: item.sub_category || '',
+                catalogId: item.catalog_id,
+                price: item.price,
+                isTrusted: Math.random() > 0.7 // 30% chance of being trusted
+            };
+        });
+    }
+
+    loadMockProducts() {
+        // Mock product data similar to Meesho style (fallback)
         this.products = [
             {
                 id: 's-532528444',
@@ -151,10 +217,6 @@ class ProductListing {
                 isTrusted: false
             }
         ];
-
-        this.filteredProducts = [...this.products];
-        this.displayProducts();
-        this.showLoading(false);
     }
 
     displayProducts() {
@@ -175,6 +237,7 @@ class ProductListing {
                     </div>
                 </div>
                 
+                ${product.catalogId ? `<div class="catalog-id">Catalog: ${product.catalogId}</div>` : ''}
                 <div class="product-id">${product.id}</div>
                 <div class="product-title">${product.title}</div>
                 
@@ -184,8 +247,16 @@ class ProductListing {
                     <span class="discount">${product.discount}</span>
                 </div>
                 
+                ${product.price ? `<div class="catalog-price">Catalog Price: ${product.price}</div>` : ''}
                 <div class="special-offer">${product.specialOffer}</div>
                 <div class="delivery-info">${product.delivery}</div>
+                
+                ${product.category && product.subCategory ? `
+                    <div class="product-categories">
+                        <span class="category-tag">${product.category}</span>
+                        <span class="subcategory-tag">${product.subCategory}</span>
+                    </div>
+                ` : ''}
                 
                 <div class="product-rating">
                     <span class="rating-stars">★★★★☆</span>

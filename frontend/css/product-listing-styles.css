@@ -266,6 +266,49 @@ body {
     margin-top: 4px;
 }
 
+/* Catalog Information Styles */
+.catalog-id {
+    font-size: 10px;
+    color: #9f2089;
+    background: #f0e8ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.catalog-price {
+    font-size: 12px;
+    color: #27ae60;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.product-categories {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.category-tag {
+    font-size: 10px;
+    color: #e91e63;
+    background: #ffeef2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.subcategory-tag {
+    font-size: 10px;
+    color: #2196f3;
+    background: #e8f4fd;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
 .wishlist-heart {
     position: absolute;
     top: 8px;

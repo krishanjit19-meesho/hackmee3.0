@@ -5,6 +5,7 @@ import (
 	"meesho-clone/configs"
 	"meesho-clone/internal/handlers"
 	"meesho-clone/internal/middleware"
+	"meesho-clone/internal/services"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -32,9 +33,23 @@ func main() {
 	router.Use(middleware.LoggerMiddleware())
 	router.Use(middleware.ErrorHandlingMiddleware())
 
+	// Initialize services
+	userService := services.NewUserService()
+
+	// Initialize Databricks service for product details
+	databricksService, err := services.NewDatabricksService()
+	if err != nil {
+		log.Printf("Warning: Failed to initialize Databricks service: %v", err)
+		databricksService = nil
+	}
+
+	productService := services.NewProductService(databricksService)
+
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler()
 	homescreenHandler := handlers.NewHomescreenHandler()
+	catalogHandler := handlers.NewCatalogHandler()
+	productHandler := handlers.NewProductHandler(productService, userService)
 
 	// Health check endpoint
 	router.GET("/health", authHandler.HealthCheck)
@@ -67,6 +82,21 @@ func main() {
 			products.GET("/search", homescreenHandler.SearchProducts)
 			products.GET("/:product_id", homescreenHandler.GetProductDetails)
 		}
+
+		// Product details routes
+		product := v1.Group("/product")
+		{
+			product.GET("/details", productHandler.GetProductDetails)
+			product.GET("/:id", productHandler.GetProductDetailsByID)
+			product.GET("/health", productHandler.HealthCheck)
+		}
+
+		// Catalog routes
+		catalog := v1.Group("/catalog")
+		{
+			catalog.GET("/", catalogHandler.GetCatalogData) // Single API for banner widget click
+			catalog.GET("/health", catalogHandler.HealthCheck)
+		}
 	}
 
 	// Add a simple route to test CORS
@@ -80,6 +110,7 @@ func main() {
 				"auth":     "/api/v1/auth/*",
 				"home":     "/api/v1/home/*",
 				"products": "/api/v1/products/*",
+				"catalog":  "/api/v1/catalog/*",
 			},
 		})
 	})
