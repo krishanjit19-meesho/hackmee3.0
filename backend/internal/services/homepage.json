@@ -1,0 +1,312 @@
+{
+  "top_nav_bar": {
+    "id": 1,
+    "title": "New Navigation Bar India",
+    "tiles": [
+      {
+        "id": 1,
+        "title": "Categories",
+        "image": "https://images-dev.meesho.com/images/marketing/1594489152649.jpg",
+        "new_image": "https://images-dev.meesho.com/images/marketing/1594489152649.jpg",
+        "destination_data": {
+          "screen": "categories",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 228,
+        "title": "Kurti & Dress Materials",
+        "image": "https://images-dev.meesho.com/images/marketing/1649688502928.png",
+        "destination_data": {
+          "screen": "single_collection",
+          "collection_id": 36176,
+          "collection_name": "Kurti & Sets",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 234,
+        "title": "Kids & Toys ",
+        "image": "https://images-dev.meesho.com/images/marketing/1649689217815.png",
+        "destination_data": {
+          "screen": "single_collection",
+          "collection_id": 32448,
+          "collection_name": "Kids",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 230,
+        "title": "Westernwear",
+        "image": "https://images-dev.meesho.com/images/marketing/1649690440106.jpeg",
+        "destination_data": {
+          "screen": "single_collection",
+          "collection_id": 30994,
+          "collection_name": "Women Fashion",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 236,
+        "title": "Home",
+        "image": "https://images-dev.meesho.com/images/marketing/1687854960403.jpg",
+        "destination_data": {
+          "screen": "catalog_listing_page",
+          "catalog_listing_page_id": 172088,
+          "payload": "",
+          "catalog_listing_page_name": "Home Decor & Furnishings",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 231,
+        "title": "Men Clothing",
+        "image": "https://images-dev.meesho.com/images/marketing/1689675132726.png",
+        "destination_data": {
+          "screen": "single_collection",
+          "collection_id": 48370,
+          "collection_name": "Men Fashion",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 227,
+        "title": "Saree",
+        "image": "https://images-dev.meesho.com/images/marketing/1628672353857.jpg",
+        "destination_data": {
+          "screen": "single_collection",
+          "collection_id": 30978,
+          "collection_name": "Sarees",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 232,
+        "title": "Suits",
+        "image": "https://images-dev.meesho.com/images/marketing/1628672428427.jpg",
+        "destination_data": {
+          "screen": "single_collection",
+          "collection_id": 30990,
+          "collection_name": "Suits",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 8,
+        "title": "Beauty",
+        "image": "https://images-dev.meesho.com/images/marketing/1651505214223.png",
+        "destination_data": {
+          "screen": "catalog_listing_page",
+          "catalog_listing_page_id": 2,
+          "payload": "",
+          "catalog_listing_page_name": "Solid",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 229,
+        "title": "Jewellery",
+        "image": "https://images-dev.meesho.com/images/marketing/1649689138272.jpeg",
+        "destination_data": {
+          "screen": "single_collection",
+          "collection_id": 30984,
+          "collection_name": "Jewellery",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 235,
+        "title": "Home Textiles",
+        "image": "https://images-dev.meesho.com/images/marketing/1687854996278.jpg",
+        "destination_data": {
+          "screen": "catalog_listing_page",
+          "catalog_listing_page_id": 68288,
+          "payload": "",
+          "catalog_listing_page_name": " Home Textiles",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 238,
+        "title": "Kitchen",
+        "image": "https://images-dev.meesho.com/images/marketing/1687854973673.jpg",
+        "destination_data": {
+          "screen": "catalog_listing_page",
+          "catalog_listing_page_id": 86271,
+          "payload": "",
+          "catalog_listing_page_name": "Kitchen Utility",
+          "has_location_filter": false
+        }
+      },
+      {
+        "id": 250,
+        "title": "Lehengas",
+        "image": "https://images-dev.meesho.com/images/marketing/1687855009620.jpg",
+        "destination_data": {
+          "screen": "catalog_listing_page",
+          "catalog_listing_page_id": 88589,
+          "payload": "",
+          "catalog_listing_page_name": "Lehengas",
+          "has_location_filter": false
+        }
+      }
+    ]
+  },
+  "widget_groups": [
+    {
+      "id": 42109,
+      "mongo_wg_id": "6712220c9433e105c4bb6d1b",
+      "position": 0,
+      "title": "Travel Bags Upto 70% Offf",
+      "tag": "",
+      "type": 5,
+      "widgets": [
+        {
+          "id": 382108,
+          "title": "Laptop Bags",
+          "image": "https://images-dev.meesho.com/images/widgets/UHQP2/sq1an.jpg",
+          "image_aspect_ratio": 1.0,
+          "screen": "catalog_listing_page",
+          "type": 23,
+          "destination_id": 180679,
+          "data": {
+            "catalog_listing_page_id": 180679,
+            "payload": "",
+            "catalog_listing_page_name": "Laptop Bags New Mall",
+            "with_oauth": false,
+            "has_location_filter": false,
+            "clp_gst_type": "gst",
+            "is_dynamic": false,
+            "screen": "catalog_listing_page",
+            "view_template_id": 1
+          },
+          "fixed": false,
+          "priority": 6
+        },
+        {
+          "id": 382109,
+          "title": "Duffel Bags",
+          "image": "https://images-dev.meesho.com/images/widgets/A3U85/bq29c.jpg",
+          "image_aspect_ratio": 1.0,
+          "screen": "catalog_listing_page",
+          "type": 23,
+          "destination_id": 186321,
+          "data": {
+            "catalog_listing_page_id": 186321,
+            "payload": "",
+            "catalog_listing_page_name": "Duffel Bags",
+            "with_oauth": false,
+            "has_location_filter": false,
+            "clp_gst_type": "gst",
+            "is_dynamic": false,
+            "screen": "catalog_listing_page",
+            "view_template_id": 1
+          },
+          "fixed": false,
+          "priority": 5
+        },
+        {
+          "id": 382110,
+          "title": "Small Travel Bags",
+          "image": "https://images-dev.meesho.com/images/widgets/R2XUE/xgdrn.jpg",
+          "image_aspect_ratio": 1.0,
+          "screen": "catalog_listing_page",
+          "type": 23,
+          "destination_id": 180448,
+          "data": {
+            "catalog_listing_page_id": 180448,
+            "payload": "",
+            "catalog_listing_page_name": "Small Travel Bags Mall",
+            "with_oauth": false,
+            "has_location_filter": false,
+            "clp_gst_type": "gst",
+            "is_dynamic": false,
+            "screen": "catalog_listing_page",
+            "view_template_id": 1
+          },
+          "fixed": false,
+          "priority": 4
+        },
+        {
+          "id": 382111,
+          "title": "Rucksacks",
+          "image": "https://images-dev.meesho.com/images/widgets/Z6MX8/zzxp9.jpg",
+          "image_aspect_ratio": 1.0,
+          "screen": "catalog_listing_page",
+          "type": 23,
+          "destination_id": 179100,
+          "data": {
+            "catalog_listing_page_id": 179100,
+            "payload": "",
+            "catalog_listing_page_name": "Rucksacks",
+            "with_oauth": false,
+            "has_location_filter": false,
+            "clp_gst_type": "gst",
+            "is_dynamic": false,
+            "screen": "catalog_listing_page",
+            "view_template_id": 1
+          },
+          "fixed": false,
+          "priority": 3
+        },
+        {
+          "id": 382112,
+          "title": "Pouches",
+          "image": "https://images-dev.meesho.com/images/widgets/DEHQA/a63ts.jpg",
+          "image_aspect_ratio": 1.0,
+          "screen": "catalog_listing_page",
+          "type": 23,
+          "destination_id": 180438,
+          "data": {
+            "catalog_listing_page_id": 180438,
+            "payload": "",
+            "catalog_listing_page_name": "Pouches Mall",
+            "with_oauth": false,
+            "has_location_filter": false,
+            "clp_gst_type": "gst",
+            "is_dynamic": false,
+            "screen": "catalog_listing_page",
+            "view_template_id": 1
+          },
+          "fixed": false,
+          "priority": 2
+        },
+        {
+          "id": 382113,
+          "title": "Travel Accessories",
+          "image": "https://images-dev.meesho.com/images/widgets/9LYKG/lvjqr.jpg",
+          "image_aspect_ratio": 1.0,
+          "screen": "catalog_listing_page",
+          "type": 23,
+          "destination_id": 186322,
+          "data": {
+            "catalog_listing_page_id": 186322,
+            "payload": "",
+            "catalog_listing_page_name": "Travel Accessories & Others",
+            "with_oauth": false,
+            "has_location_filter": false,
+            "clp_gst_type": "gst",
+            "is_dynamic": false,
+            "screen": "catalog_listing_page",
+            "view_template_id": 1
+          },
+          "fixed": false,
+          "priority": 1
+        }
+      ],
+      "background_color": "#FFFFFF",
+      "dynamic": false,
+      "ds_enabled": false,
+      "ads_enabled": false,
+      "is_bottomsheet_wg": false,
+      "theme": "",
+      "slots": 0,
+      "priority": 10000000,
+      "slot_number": 1,
+      "widget_group_type": "FIXED",
+      "sdui_widget_group": false,
+      "widget_group_components": {},
+      "is_widget_paginated": false
+    }
+  ]
+}

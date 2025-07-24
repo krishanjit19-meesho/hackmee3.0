@@ -1,0 +1,356 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #ffeef2 0%, #f8e8ff 50%, #e8f2ff 100%);
+    min-height: 100vh;
+    padding-top: 60px; /* Reduced for mobile */
+}
+
+.container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* Header Styles - Mobile First */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    height: 32px;
+    width: auto;
+    max-width: 120px;
+}
+
+.search-bar {
+    display: flex;
+    flex: 1;
+    margin: 0 12px;
+    position: relative;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+    background: #f8f8f8;
+}
+
+.search-bar input:focus {
+    border-color: #e91e63;
+    background: white;
+}
+
+.search-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 6px;
+    color: #666;
+}
+
+.header-links {
+    display: none; /* Hide on mobile */
+}
+
+/* Main Content - Mobile First */
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+    padding: 20px 0;
+}
+
+/* Login Section - Mobile First */
+.login-section {
+    width: 100%;
+    max-width: 100%;
+}
+
+.login-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin: 0 8px;
+}
+
+.login-card h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 24px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.phone-input-container {
+    display: flex;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+    background: white;
+}
+
+.phone-input-container:focus-within {
+    border-color: #e91e63;
+    box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.1);
+}
+
+.country-code {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f8f8f8;
+    border-right: 1px solid #e0e0e0;
+    gap: 6px;
+    min-width: 80px;
+}
+
+.flag {
+    width: 18px;
+    height: 14px;
+    border-radius: 2px;
+}
+
+.country-code span {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.phone-input-container input {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background: white;
+}
+
+.phone-input-container input::placeholder {
+    color: #999;
+}
+
+.continue-btn {
+    width: 100%;
+    background: #e91e63;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 8px;
+}
+
+.continue-btn:hover {
+    background: #c2185b;
+}
+
+.continue-btn:active {
+    transform: scale(0.98);
+}
+
+.continue-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.terms {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.terms p {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.terms a {
+    color: #e91e63;
+    text-decoration: none;
+}
+
+.terms a:hover {
+    text-decoration: underline;
+}
+
+/* Tablet Styles */
+@media (min-width: 768px) {
+    body {
+        padding-top: 80px;
+    }
+    
+    .container {
+        max-width: 600px;
+        padding: 0 24px;
+    }
+    
+    .header {
+        padding: 15px 24px;
+    }
+    
+    .logo-img {
+        height: 36px;
+        max-width: 140px;
+    }
+    
+    .search-bar {
+        margin: 0 20px;
+    }
+    
+    .search-bar input {
+        padding: 12px 20px;
+        border-radius: 24px;
+    }
+    
+    .login-card {
+        padding: 32px 28px;
+        margin: 0;
+    }
+    
+    .login-card h3 {
+        font-size: 22px;
+    }
+    
+    .phone-input-container {
+        border-radius: 16px;
+    }
+    
+    .country-code {
+        padding: 14px 18px;
+        min-width: 90px;
+    }
+    
+    .phone-input-container input {
+        padding: 14px 18px;
+    }
+    
+    .continue-btn {
+        padding: 16px;
+    }
+}
+
+/* Desktop Styles */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 800px;
+        padding: 0 32px;
+    }
+    
+    .header {
+        padding: 20px 32px;
+    }
+    
+    .logo-img {
+        height: 40px;
+        max-width: 160px;
+    }
+    
+    .search-bar {
+        margin: 0 30px;
+        max-width: 400px;
+    }
+    
+    .header-links {
+        display: flex;
+        gap: 16px;
+    }
+    
+    .header-links a {
+        text-decoration: none;
+        color: #666;
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: all 0.3s;
+    }
+    
+    .header-links a:hover {
+        background: #f5f5f5;
+        color: #e91e63;
+    }
+    
+    .login-card {
+        padding: 40px 36px;
+        max-width: 450px;
+        margin: 0 auto;
+    }
+    
+    .login-card h3 {
+        font-size: 24px;
+    }
+    
+    .phone-input-container {
+        border-radius: 20px;
+    }
+    
+    .country-code {
+        padding: 16px 20px;
+        min-width: 100px;
+    }
+    
+    .phone-input-container input {
+        padding: 16px 20px;
+    }
+    
+    .continue-btn {
+        padding: 18px;
+    }
+    
+    .continue-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
+    }
+} 
