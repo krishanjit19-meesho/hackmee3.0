@@ -393,14 +393,8 @@ class MeeshoHome {
     }
 
     handleBannerClick() {
-        // Handle banner click - can be customized for specific offers or campaigns
-        alert('🎉 Special Offer Banner Clicked!\n\nThis could redirect to:\n• Special sale page\n• New collection\n• Limited time offer\n• Featured products');
-        
-        // Example: You could redirect to a specific page
-        // window.location.href = 'special-offer.html';
-        
-        // Or trigger a specific action
-        // this.loadSpecialProducts();
+        // Redirect to the product listing page
+        window.location.href = 'product-listing.html';
     }
 
     handleNavigation(navItem) {

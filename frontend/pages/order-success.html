@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Order Placed Successfully - Meesho</title>
+    <link rel="stylesheet" href="../css/order-success-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <div class="header-left">
+                    <button class="back-btn" id="backBtn">←</button>
+                    <div class="logo">meesho</div>
+                </div>
+                <div class="header-right">
+                    <button class="header-btn search-btn">🔍</button>
+                    <button class="header-btn wishlist-btn">❤️</button>
+                    <button class="header-btn cart-btn">
+                        🛒
+                        <span class="cart-badge">0</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Success Content -->
+        <section class="success-content">
+            <!-- Success Animation -->
+            <div class="success-animation">
+                <div class="success-icon">✅</div>
+                <div class="success-circle"></div>
+            </div>
+
+            <!-- Order Details -->
+            <div class="order-details">
+                <h1 class="success-title">Order Placed Successfully!</h1>
+                <p class="success-subtitle">Your order has been confirmed and will be delivered soon.</p>
+                
+                <div class="order-info-card">
+                    <div class="order-header">
+                        <h3 class="order-number">Order #MEESH123456</h3>
+                        <span class="order-date" id="orderDate"></span>
+                    </div>
+                    
+                    <div class="order-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Order Total:</span>
+                            <span class="summary-value">₹163</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Payment Method:</span>
+                            <span class="summary-value">Online Payment</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Delivery Address:</span>
+                            <span class="summary-value">Home Address</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Expected Delivery:</span>
+                            <span class="summary-value">3-5 business days</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Details -->
+                <div class="product-details-card">
+                    <h3 class="card-title">Ordered Items</h3>
+                    <div class="ordered-product">
+                        <img src="../assets/icon.png" alt="Product" class="product-image">
+                        <div class="product-info">
+                            <h4 class="product-title">Artificial Natural Looking 26 Leaves Snack Rabbur Plant</h4>
+                            <div class="product-meta">
+                                <span class="product-price">₹163</span>
+                                <span class="product-quantity">Qty: 1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tracking Info -->
+                <div class="tracking-card">
+                    <h3 class="card-title">Order Status</h3>
+                    <div class="tracking-timeline">
+                        <div class="timeline-item active">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h4 class="timeline-title">Order Confirmed</h4>
+                                <p class="timeline-time" id="orderTime"></p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h4 class="timeline-title">Processing</h4>
+                                <p class="timeline-time">Within 24 hours</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h4 class="timeline-title">Shipped</h4>
+                                <p class="timeline-time">1-2 business days</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h4 class="timeline-title">Delivered</h4>
+                                <p class="timeline-time">3-5 business days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Action Buttons -->
+        <section class="action-buttons">
+            <button class="primary-btn" id="trackOrderBtn">
+                <span class="btn-icon">📦</span>
+                <span class="btn-text">Track Order</span>
+            </button>
+            <button class="secondary-btn" id="continueShoppingBtn">
+                <span class="btn-icon">🛍️</span>
+                <span class="btn-text">Continue Shopping</span>
+            </button>
+        </section>
+
+        <!-- Additional Info -->
+        <section class="additional-info">
+            <div class="info-card">
+                <h3 class="info-title">Need Help?</h3>
+                <div class="info-actions">
+                    <button class="info-btn" id="contactSupportBtn">
+                        <span class="info-icon">📞</span>
+                        <span class="info-text">Contact Support</span>
+                    </button>
+                    <button class="info-btn" id="viewOrdersBtn">
+                        <span class="info-icon">📋</span>
+                        <span class="info-text">View All Orders</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="../js/order-success-script.js"></script>
+</body>
+</html> 
