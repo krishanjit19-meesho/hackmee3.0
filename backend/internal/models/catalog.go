@@ -35,6 +35,7 @@ type CatalogProduct struct {
 type CatalogMeta struct {
 	TotalProducts int       `json:"total_products"`
 	UserID        string    `json:"user_id"`
+	UserCode      string    `json:"user_code,omitempty"`
 	GeneratedAt   time.Time `json:"generated_at"`
 	Source        string    `json:"source"`
 }

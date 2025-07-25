@@ -42,6 +42,7 @@ func main() {
 	homescreenHandler := handlers.NewHomescreenHandler()
 	catalogHandler := handlers.NewCatalogHandler()
 	productHandler := handlers.NewProductHandler(productService, userService)
+	orderHandler := handlers.NewOrderHandler()
 
 	// Health check endpoint
 	router.GET("/health", authHandler.HealthCheck)
@@ -89,6 +90,13 @@ func main() {
 			catalog.GET("/", catalogHandler.GetCatalogData) // Single API for banner widget click
 			catalog.GET("/health", catalogHandler.HealthCheck)
 		}
+
+		// Order routes
+		order := v1.Group("/order")
+		{
+			order.POST("/place", orderHandler.PlaceOrder)
+			order.GET("/health", orderHandler.HealthCheck)
+		}
 	}
 
 	// Add a simple route to test CORS
@@ -103,6 +111,7 @@ func main() {
 				"home":     "/api/v1/home/*",
 				"products": "/api/v1/products/*",
 				"catalog":  "/api/v1/catalog/*",
+				"order":    "/api/v1/order/*",
 			},
 		})
 	})

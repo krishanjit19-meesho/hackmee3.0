@@ -69,6 +69,14 @@ class LoadingPage {
                 // Store the catalog data in localStorage for the product listing page
                 localStorage.setItem('catalogData', JSON.stringify(result));
                 
+                // Store user code if available in the response
+                if (result.meta && result.meta.user_code) {
+                    localStorage.setItem('userCode', result.meta.user_code);
+                } else if (result.meta && result.meta.userCode) {
+                    // Fallback for different field name
+                    localStorage.setItem('userCode', result.meta.userCode);
+                }
+                
                 // Redirect to product listing page immediately
                 window.location.href = 'product-listing.html';
             } else {

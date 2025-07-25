@@ -459,9 +459,84 @@ class ProductDetails {
         }
     }
 
-    buyNow() {
-        // Redirect directly to order success page
-        window.location.href = `order-success.html?productId=${this.productData.id}&quantity=1`;
+    async buyNow() {
+        console.log('=== BUY NOW DEBUG START ===');
+        
+        try {
+            // Debug: Check if productData exists
+            console.log('Product Data:', this.productData);
+            
+            if (!this.productData) {
+                console.error('No product data available');
+                alert('Product data not loaded. Please refresh the page.');
+                return;
+            }
+
+            // Get user data from localStorage
+            const userDataString = localStorage.getItem('userData');
+            console.log('User Data String from localStorage:', userDataString);
+            
+            if (!userDataString) {
+                console.error('No user data found in localStorage');
+                alert('Please login first');
+                return;
+            }
+
+            const userData = JSON.parse(userDataString);
+            console.log('Parsed User Data:', userData);
+            
+            if (!userData.userId) {
+                console.error('No userId in user data');
+                alert('Invalid user data. Please login again.');
+                return;
+            }
+
+            // Prepare request payload
+            const requestPayload = {
+                user_id: userData.userId,
+                product_id: this.productData.id,
+                catalog_id: this.productData.catalogId || '12345',
+                quantity: 1
+            };
+            
+            console.log('Request Payload:', requestPayload);
+            console.log('Request URL:', 'http://localhost:8080/api/v1/order/place');
+            
+            // Call the place order API
+            const response = await fetch('http://localhost:8080/api/v1/order/place', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestPayload)
+            });
+
+            console.log('Response Status:', response.status);
+            console.log('Response Headers:', response.headers);
+
+            const result = await response.json();
+            console.log('Response Body:', result);
+
+            if (response.ok && result.success) {
+                console.log('Order placed successfully:', result.data);
+                // Redirect to order success page with order details
+                window.location.href = `order-success.html?orderId=${result.data.order_id}&productId=${this.productData.id}&quantity=1`;
+            } else {
+                console.error('Failed to place order:', result);
+                const errorMessage = result.error || result.message || 'Unknown error occurred';
+                alert(`Failed to place order: ${errorMessage}`);
+            }
+        } catch (error) {
+            console.error('Error placing order:', error);
+            console.error('Error details:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
+            alert('Network error. Please check your connection and try again.');
+        }
+        
+        console.log('=== BUY NOW DEBUG END ===');
     }
 
     generateOrderId() {

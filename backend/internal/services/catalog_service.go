@@ -27,6 +27,7 @@ func NewCatalogService() *CatalogService {
 func (s *CatalogService) GetCatalogData(userID string) (*models.CatalogResponse, error) {
 	var catalogIDs []string
 	var source string
+	var userCode string
 
 	// Step 1: Try to get user's code from user_mapping table
 	userCode, err := s.getUserCode(userID)
@@ -34,6 +35,7 @@ func (s *CatalogService) GetCatalogData(userID string) (*models.CatalogResponse,
 		fmt.Printf("Warning: Failed to get user code: %v. Using fallback catalog IDs.\n", err)
 		catalogIDs = s.getCatalogIDs()
 		source = "fallback_catalog_ids_with_ranking"
+		userCode = "" // Set empty string if not found
 	} else {
 		// Step 2: Try to get catalog IDs from RTO API based on user's code
 		rtoService := NewRTOService()
@@ -69,6 +71,7 @@ func (s *CatalogService) GetCatalogData(userID string) (*models.CatalogResponse,
 		Meta: models.CatalogMeta{
 			TotalProducts: len(sortedCatalogProducts),
 			UserID:        userID,
+			UserCode:      userCode,
 			GeneratedAt:   time.Now(),
 			Source:        source,
 		},
@@ -126,7 +129,7 @@ func (s *CatalogService) getProductInfoByCatalogIDs(catalogIDs []string) ([]mode
 
 	// Debug logging
 	fmt.Printf("Querying price_product_info table for %d catalog IDs\n", len(catalogIDs))
-	
+
 	// Query price_product_info table for the given catalog IDs
 	result := s.db.Where("catalog_id IN ?", catalogIDs).Find(&priceProductInfos)
 
