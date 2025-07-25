@@ -19,13 +19,16 @@ type CatalogResponse struct {
 
 // CatalogProduct represents a product in the catalog
 type CatalogProduct struct {
-	CatalogID   string `json:"catalog_id"`
-	ProductID   string `json:"product_id"`
-	ImageURL    string `json:"image_url"`
-	Category    string `json:"category"`
-	SubCategory string `json:"sub_category"`
-	Title       string `json:"title"`
-	Price       string `json:"price,omitempty"`
+	CatalogID       string `json:"catalog_id"`
+	ProductID       string `json:"product_id"`
+	ImageURL        string `json:"image_url"`
+	Category        string `json:"category"`
+	SubCategory     string `json:"sub_category"`
+	Title           string `json:"title"`
+	Price           string `json:"price,omitempty"`
+	OriginalPrice   string `json:"original_price,omitempty"`
+	Discount        string `json:"discount,omitempty"`
+	DiscountPercent int    `json:"discount_percent,omitempty"`
 }
 
 // CatalogMeta represents metadata about the catalog response

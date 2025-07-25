@@ -41,7 +41,6 @@ type ProductDetails struct {
 	Specifications  map[string]string `json:"specifications"`
 	Variants        []ProductVariant  `json:"variants"`
 	ReviewsList     []ProductReview   `json:"reviews_list"`
-	SimilarProducts []SimilarProduct  `json:"similar_products"`
 }
 
 // ProductVariant represents product variants (size, color, etc.)
@@ -65,16 +64,6 @@ type ProductReview struct {
 	Date     time.Time `json:"date"`
 	Verified bool      `json:"verified"`
 	Helpful  int       `json:"helpful"`
-}
-
-// SimilarProduct represents a similar product recommendation
-type SimilarProduct struct {
-	ProductID string  `json:"product_id"`
-	Title     string  `json:"title"`
-	Image     string  `json:"image"`
-	Price     string  `json:"price"`
-	Rating    float64 `json:"rating"`
-	Reviews   int     `json:"reviews"`
 }
 
 // ProductMeta represents metadata for product details

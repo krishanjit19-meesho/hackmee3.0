@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net/http"
 	"strings"
 	"time"
 
@@ -72,107 +73,208 @@ func (s *ProductService) GetProductDetails(productID, userID string) (*models.Pr
 	}, nil
 }
 
-// getProductDetailsFromDatabase retrieves product details from product_info table
+// getProductDetailsFromDatabase retrieves product details from price_product_info table
 func (s *ProductService) getProductDetailsFromDatabase(productID string) (*models.ProductDetails, error) {
-	var productInfo models.ProductInfo
+	var priceProductInfo models.PriceProductInfo
 
-	// Query product_info table for the product
-	result := s.db.Where("product_id = ?", productID).First(&productInfo)
+	// Query price_product_info table for the product
+	result := s.db.Where("product_id = ?", productID).First(&priceProductInfo)
 	if result.Error != nil {
-		return nil, fmt.Errorf("failed to query product_info table: %w", result.Error)
+		return nil, fmt.Errorf("failed to query price_product_info table: %w", result.Error)
 	}
 
-	log.Printf("Found product in database: %s", productInfo.ProductID)
+	log.Printf("Found product in database: %s", priceProductInfo.ProductID)
 
-	// Convert ProductInfo to ProductDetails
-	productDetails := s.convertProductInfoToProductDetails(productInfo)
+	// Convert PriceProductInfo to ProductDetails
+	productDetails := s.convertPriceProductInfoToProductDetails(priceProductInfo)
 
 	return &productDetails, nil
 }
 
-// convertProductInfoToProductDetails converts ProductInfo to ProductDetails
-func (s *ProductService) convertProductInfoToProductDetails(productInfo models.ProductInfo) models.ProductDetails {
+// convertPriceProductInfoToProductDetails converts PriceProductInfo to ProductDetails
+func (s *ProductService) convertPriceProductInfoToProductDetails(priceProductInfo models.PriceProductInfo) models.ProductDetails {
 	// Generate image URL from the images field or catalog_id
-	imageURL := s.generateImageURL(productInfo.CatalogID, productInfo.Images)
+	imageURL := s.generateImageURL(priceProductInfo.CatalogID, priceProductInfo.Images)
 
-	// Use the name field as title, fallback to category + subcategory
-	title := productInfo.Name
+	// Use the name field for both title and description
+	title := priceProductInfo.Name
 	if title == "" {
-		title = fmt.Sprintf("%s - %s", productInfo.Category, productInfo.Sscat)
+		title = fmt.Sprintf("%s - %s", priceProductInfo.Category, priceProductInfo.Sscat)
 	}
 
-	// Generate price based on product info
-	price := s.generatePriceFromProductInfo(productInfo)
+	// Use the name field as description as well, with fallback
+	description := priceProductInfo.Name
+	if description == "" {
+		description = fmt.Sprintf("High-quality %s %s. Perfect for your needs with excellent durability and style.",
+			strings.ToLower(priceProductInfo.Category), strings.ToLower(priceProductInfo.Sscat))
+	}
 
-	// Generate basic images array
-	images := []string{imageURL}
+	// Generate price and discount based on meesho_price_with_shipping and supplier_listed_price
+	price, originalPrice, discount, discountPercent := s.generatePriceFromPriceProductInfo(priceProductInfo)
+
+	// Generate images array with counter-based approach
+	images := s.generateProductImages(priceProductInfo.ProductID, imageURL)
 
 	return models.ProductDetails{
-		ProductID:   productInfo.ProductID,
-		CatalogID:   productInfo.CatalogID,
-		Title:       title,
-		Category:    productInfo.Category,
-		SubCategory: productInfo.Sscat,
-		Price:       price,
-		MainImage:   imageURL,
-		Images:      images,
-		Brand:       productInfo.BrandName,
-		Description: fmt.Sprintf("High-quality %s %s. Perfect for your needs with excellent durability and style.",
-			strings.ToLower(productInfo.Category), strings.ToLower(productInfo.Sscat)),
+		ProductID:       priceProductInfo.ProductID,
+		CatalogID:       priceProductInfo.CatalogID,
+		Title:           title,
+		Category:        priceProductInfo.Category,
+		SubCategory:     priceProductInfo.Sscat,
+		Price:           price,
+		OriginalPrice:   originalPrice,
+		Discount:        discount,
+		DiscountPercent: discountPercent,
+		MainImage:       imageURL,
+		Images:          images,
+		Brand:           priceProductInfo.BrandName,
+		Description:     description,
 	}
 }
 
 // generateImageURL generates image URL from catalog_id and images field
 func (s *ProductService) generateImageURL(catalogID, images string) string {
+	var imageURL string
+
 	// If images field has data, use it
 	if images != "" {
-		// You might need to parse the images field based on your data format
-		// For now, assuming it's a direct URL or needs to be prefixed
-		if len(images) > 0 && images[:4] == "http" {
-			return images
+		// Split by comma to get individual image paths
+		imagePaths := strings.Split(images, ",")
+		if len(imagePaths) > 0 {
+			// Take the first image as the main image
+			mainImage := strings.TrimSpace(imagePaths[0])
+
+			// Check if it's already a full URL
+			if len(mainImage) > 0 && mainImage[:4] == "http" {
+				imageURL = mainImage
+			} else if len(mainImage) > 0 {
+				// If it's a relative path, prefix with Meesho CDN
+				imageURL = fmt.Sprintf("https://images.meesho.com%s", mainImage)
+			}
 		}
-		// If it's a relative path, prefix with Meesho CDN
-		return fmt.Sprintf("https://images.meesho.com%s", images)
 	}
 
-	// Fallback to generating URL from catalog_id
-	return fmt.Sprintf("https://images.meesho.com/images/products/%s/1_256.jpg", catalogID)
+	// If no image URL was set, fallback to generating URL from catalog_id
+	if imageURL == "" {
+		imageURL = fmt.Sprintf("https://images.meesho.com/images/products/%s/1_256.jpg", catalogID)
+	}
+
+	// Check if the generated image exists, if not use a fallback
+	if !s.imageExists(imageURL) {
+		log.Printf("Main image not found, using fallback: %s", imageURL)
+		// Use a default fallback image
+		imageURL = "https://images.meesho.com/images/products/default/1_256.jpg"
+	}
+
+	return imageURL
 }
 
-// generatePriceFromProductInfo generates price based on product info
-func (s *ProductService) generatePriceFromProductInfo(productInfo models.ProductInfo) string {
-	// You can implement price generation logic based on:
-	// - Category (different categories have different price ranges)
-	// - Brand (branded vs non-branded)
-	// - Scale (large vs small scale)
-	// - Other fields in the product_info table
+// generatePriceFromPriceProductInfo generates price and discount based on meesho_price_with_shipping and supplier_listed_price
+func (s *ProductService) generatePriceFromPriceProductInfo(priceProductInfo models.PriceProductInfo) (string, string, string, int) {
+	// Use supplier_listed_price as the actual price (what customers pay)
+	actualPrice := priceProductInfo.SupplierListedPrice
 
-	// For now, generating a basic price based on catalog_id
-	// In a real implementation, you might want to add a price field to the table
-	// or implement a pricing algorithm based on the available fields
+	// Use meesho_price_with_shipping as the original price (strikethrough price)
+	originalPrice := priceProductInfo.MeeshoPriceWithShipping
 
-	// Simple hash-based price generation
-	price := 0
-	for _, char := range productInfo.CatalogID {
-		price += int(char)
+	// Calculate discount amount
+	discountAmount := originalPrice - actualPrice
+
+	// Calculate discount percentage
+	var discountPercent int
+	if originalPrice > 0 {
+		discountPercent = int((discountAmount / originalPrice) * 100)
 	}
-	price = (price % 4500) + 500 // Price between 500-5000
 
-	return fmt.Sprintf("₹%d", price)
+	// Format prices as strings
+	priceStr := fmt.Sprintf("₹%.0f", actualPrice)
+	originalPriceStr := fmt.Sprintf("₹%.0f", originalPrice)
+	discountStr := fmt.Sprintf("₹%.0f OFF", discountAmount)
+
+	return priceStr, originalPriceStr, discountStr, discountPercent
+}
+
+// generateProductImages generates images array with counter-based approach
+func (s *ProductService) generateProductImages(productID, mainImage string) []string {
+	images := []string{mainImage}
+
+	// Generate additional images from 1-4 and check if they exist concurrently
+	imageURLs := make([]string, 4)
+	for i := 1; i <= 4; i++ {
+		imageURLs[i-1] = fmt.Sprintf("https://images.meesho.com/images/products/%s/%d_256.jpg", productID, i)
+	}
+
+	// Check images concurrently for better performance
+	existingImages := s.checkImagesConcurrently(imageURLs)
+	images = append(images, existingImages...)
+
+	return images
+}
+
+// checkImagesConcurrently checks multiple images concurrently
+func (s *ProductService) checkImagesConcurrently(imageURLs []string) []string {
+	results := make(chan string, len(imageURLs))
+
+	// Start goroutines for each image check
+	for _, url := range imageURLs {
+		go func(imageURL string) {
+			if s.imageExists(imageURL) {
+				results <- imageURL
+			} else {
+				results <- "" // Empty string for non-existent images
+			}
+		}(url)
+	}
+
+	// Collect results with timeout
+	var existingImages []string
+	timeout := time.After(10 * time.Second) // 10 second timeout for all image checks
+
+	for i := 0; i < len(imageURLs); i++ {
+		select {
+		case result := <-results:
+			if result != "" {
+				existingImages = append(existingImages, result)
+			}
+		case <-timeout:
+			log.Printf("Timeout reached while checking images for product")
+			return existingImages
+		}
+	}
+
+	return existingImages
+}
+
+// imageExists checks if an image URL exists using HTTP HEAD request
+func (s *ProductService) imageExists(imageURL string) bool {
+	client := &http.Client{
+		Timeout: 5 * time.Second, // 5 second timeout
+	}
+
+	req, err := http.NewRequest("HEAD", imageURL, nil)
+	if err != nil {
+		log.Printf("Error creating request for %s: %v", imageURL, err)
+		return false
+	}
+
+	// Set user agent to avoid being blocked
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("Error checking image %s: %v", imageURL, err)
+		return false
+	}
+	defer resp.Body.Close()
+
+	exists := resp.StatusCode >= 200 && resp.StatusCode < 300
+	return exists
 }
 
 // enrichProductDetails adds mock data to enrich the product details
 func (s *ProductService) enrichProductDetails(product *models.ProductDetails, productID, userID string) {
-	// Generate random price data
-	priceValue := rand.Intn(1000) + 100
-	originalPrice := priceValue + rand.Intn(500) + 100
-	discountPercent := int(float64(originalPrice-priceValue) / float64(originalPrice) * 100)
+	// Note: Pricing data is now handled by the database, so we don't override it here
 
-	product.OriginalPrice = fmt.Sprintf("₹%d", originalPrice)
-	product.Discount = fmt.Sprintf("₹%d OFF", originalPrice-priceValue)
-	product.DiscountPercent = discountPercent
-
-	// Generate mock data for other fields
 	if product.Description == "" {
 		product.Description = fmt.Sprintf("High-quality %s %s. Perfect for your needs with excellent durability and style.",
 			strings.ToLower(product.Category), strings.ToLower(product.SubCategory))
@@ -208,8 +310,6 @@ func (s *ProductService) enrichProductDetails(product *models.ProductDetails, pr
 	// Generate reviews
 	product.ReviewsList = s.generateMockReviews(productID)
 
-	// Generate similar products
-	product.SimilarProducts = s.generateSimilarProducts(productID)
 }
 
 // generateMockProductDetails creates complete mock product details
@@ -226,19 +326,18 @@ func (s *ProductService) generateMockProductDetails(productID, userID string) mo
 	category := categories[rand.Intn(len(categories))]
 	subCategory := subCategories[rand.Intn(len(subCategories))]
 
-	// Generate mock images
-	images := []string{
-		"https://images.meesho.com/images/products/1234567/1_400.jpg",
-		"https://images.meesho.com/images/products/1234567/2_400.jpg",
-		"https://images.meesho.com/images/products/1234567/3_400.jpg",
-	}
+	// Generate a mock name that will be used for both title and description
+	mockName := fmt.Sprintf("Premium %s %s with excellent features", category, subCategory)
+
+	// Generate mock images with counter-based approach and existence check
+	mainImage := "https://images.meesho.com/images/products/1234567/1_256.jpg"
+	images := s.generateProductImages("1234567", mainImage)
 
 	return models.ProductDetails{
-		ProductID: productID,
-		CatalogID: fmt.Sprintf("CAT%d", rand.Intn(1000000)),
-		Title:     fmt.Sprintf("Premium %s %s", category, subCategory),
-		Description: fmt.Sprintf("High-quality %s %s with excellent features. Perfect for your daily needs with premium quality and durability.",
-			strings.ToLower(category), strings.ToLower(subCategory)),
+		ProductID:       productID,
+		CatalogID:       fmt.Sprintf("CAT%d", rand.Intn(1000000)),
+		Title:           mockName,
+		Description:     mockName,
 		Category:        category,
 		SubCategory:     subCategory,
 		Price:           fmt.Sprintf("₹%d", priceValue),
@@ -267,8 +366,7 @@ func (s *ProductService) generateMockProductDetails(productID, userID string) mo
 			{ID: "2", Name: "Size", Value: "Medium", Price: fmt.Sprintf("₹%d", priceValue), Stock: 20, Selected: false},
 			{ID: "3", Name: "Size", Value: "Large", Price: fmt.Sprintf("₹%d", priceValue), Stock: 10, Selected: false},
 		},
-		ReviewsList:     s.generateMockReviews(productID),
-		SimilarProducts: s.generateSimilarProducts(productID),
+		ReviewsList: s.generateMockReviews(productID),
 	}
 }
 
@@ -307,24 +405,4 @@ func (s *ProductService) generateMockReviews(productID string) []models.ProductR
 	}
 
 	return reviews
-}
-
-// generateSimilarProducts creates mock similar products
-func (s *ProductService) generateSimilarProducts(productID string) []models.SimilarProduct {
-	similarProducts := []models.SimilarProduct{}
-
-	for i := 0; i < 4; i++ {
-		price := rand.Intn(1000) + 100
-		similarProduct := models.SimilarProduct{
-			ProductID: fmt.Sprintf("similar_%s_%d", productID, i+1),
-			Title:     fmt.Sprintf("Similar Product %d", i+1),
-			Image:     fmt.Sprintf("https://images.meesho.com/images/products/%d/1_400.jpg", rand.Intn(1000000)),
-			Price:     fmt.Sprintf("₹%d", price),
-			Rating:    3.0 + rand.Float64()*2.0,
-			Reviews:   rand.Intn(5000) + 50,
-		}
-		similarProducts = append(similarProducts, similarProduct)
-	}
-
-	return similarProducts
 }

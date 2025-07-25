@@ -60,12 +60,7 @@ class ProductDetails {
             });
         });
 
-        // Similar product thumbnails
-        document.querySelectorAll('.similar-thumbnail').forEach((thumbnail, index) => {
-            thumbnail.addEventListener('click', () => {
-                this.selectSimilarProduct(index);
-            });
-        });
+
 
         // Product action buttons
         const wishlistAction = document.querySelector('.wishlist-action');
@@ -133,13 +128,7 @@ class ProductDetails {
             });
         });
 
-        // View reviews button
-        const viewReviewsBtn = document.querySelector('.view-reviews-btn');
-        if (viewReviewsBtn) {
-            viewReviewsBtn.addEventListener('click', () => {
-                this.viewAllReviews();
-            });
-        }
+
 
         // Add touch feedback for mobile
         this.addTouchFeedback();
@@ -304,6 +293,9 @@ class ProductDetails {
             mainImage.src = this.productData.mainImage;
         }
 
+        // Update image dots based on available images
+        this.updateImageDots();
+
         // Update pricing
         const currentPrice = document.querySelector('.current-price');
         const originalPrice = document.querySelector('.original-price');
@@ -330,8 +322,7 @@ class ProductDetails {
         if (ratingText) ratingText.textContent = `${this.productData.rating.toFixed(1)} out of 5`;
         if (ratingCount) ratingCount.textContent = `(${this.productData.reviews.toLocaleString()} reviews)`;
 
-        // Update similar products
-        this.updateSimilarProducts();
+
 
         // Update product details section
         this.updateProductDetailsSection();
@@ -352,21 +343,29 @@ class ProductDetails {
         }
     }
 
-    updateSimilarProducts() {
-        const similarTitle = document.querySelector('.similar-title');
-        const similarThumbnails = document.querySelector('.similar-thumbnails');
-        
-        if (similarTitle && this.productData.similarProducts) {
-            const count = this.productData.similarProducts.length;
-            similarTitle.textContent = `${count} Similar Products`;
-        }
 
-        if (similarThumbnails && this.productData.similarProducts && this.productData.similarProducts.length > 0) {
-            similarThumbnails.innerHTML = this.productData.similarProducts.map((product, index) => `
-                <div class="similar-thumbnail ${index === 0 ? 'active' : ''}" data-product-id="${product.product_id}">
-                    <img src="${product.image}" alt="${product.title}" class="thumbnail-image" onerror="this.src='../assets/icon.png'">
-                </div>
-            `).join('');
+
+    updateImageDots() {
+        const imageDots = document.querySelector('.image-dots');
+        if (!imageDots || !this.productData.images) return;
+
+        // Clear existing dots
+        imageDots.innerHTML = '';
+
+        // Create dots for each available image (up to 5 total: main + 4 additional)
+        const totalImages = Math.min(this.productData.images.length, 5);
+        
+        for (let i = 0; i < totalImages; i++) {
+            const dot = document.createElement('div');
+            dot.className = `dot ${i === 0 ? 'active' : ''}`;
+            dot.setAttribute('data-image', i.toString());
+            
+            // Add click event
+            dot.addEventListener('click', () => {
+                this.changeImage(i);
+            });
+            
+            imageDots.appendChild(dot);
         }
     }
 
@@ -397,13 +396,13 @@ class ProductDetails {
     }
 
     changeImage(index) {
-        if (index < 0 || index >= this.productImages.length) return;
+        if (!this.productData.images || index < 0 || index >= this.productData.images.length) return;
         
         this.currentImageIndex = index;
         const mainImage = document.getElementById('mainImage');
         
         if (mainImage) {
-            mainImage.src = this.productImages[index];
+            mainImage.src = this.productData.images[index];
         }
 
         // Update dots
@@ -412,14 +411,7 @@ class ProductDetails {
         });
     }
 
-    selectSimilarProduct(index) {
-        document.querySelectorAll('.similar-thumbnail').forEach((thumbnail, i) => {
-            thumbnail.classList.toggle('active', i === index);
-        });
-        
-        // In a real app, this would load a different product
-        alert(`Similar product ${index + 1} selected!`);
-    }
+
 
     toggleWishlist() {
         const wishlistBtns = document.querySelectorAll('.wishlist-btn, .wishlist-action');
@@ -501,9 +493,7 @@ class ProductDetails {
         }
     }
 
-    viewAllReviews() {
-        alert('Customer Reviews:\n\n★★★★☆ John D. - "Great quality, looks very natural!"\n★★★★★ Sarah M. - "Perfect for my office desk"\n★★★★☆ Mike R. - "Good value for money"\n★★★★★ Lisa K. - "Beautiful and low maintenance"\n\nView all 1,234 reviews...');
-    }
+
 
     goBack() {
         // Check if we came from product listing page
@@ -526,7 +516,7 @@ class ProductDetails {
 
     addTouchFeedback() {
         // Add touch feedback for interactive elements
-        const touchElements = document.querySelectorAll('.action-btn, .dot, .similar-thumbnail, .add-to-cart-btn, .buy-now-btn, .view-reviews-btn');
+        const touchElements = document.querySelectorAll('.action-btn, .dot, .add-to-cart-btn, .buy-now-btn');
         
         console.log('Touch elements found:', touchElements.length);
         

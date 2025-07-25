@@ -118,17 +118,40 @@ class ProductListing {
 
     convertCatalogToProducts(catalogData) {
         return catalogData.map((item, index) => {
-            // Generate random price data for demo (in real app, this would come from backend)
-            const currentPrice = Math.floor(Math.random() * 500) + 100;
-            const originalPrice = Math.floor(currentPrice * (1 + Math.random() * 0.5));
-            const discount = Math.floor(((originalPrice - currentPrice) / originalPrice) * 100);
+            // Parse price data from backend response
+            let currentPrice = 0;
+            let originalPrice = 0;
+            let discountPercent = 0;
+            
+            // Extract numeric values from price strings (remove ₹ symbol and convert to number)
+            if (item.price) {
+                currentPrice = parseInt(item.price.replace('₹', '').replace(/,/g, '')) || 0;
+            }
+            
+            if (item.original_price) {
+                originalPrice = parseInt(item.original_price.replace('₹', '').replace(/,/g, '')) || 0;
+            }
+            
+            if (item.discount_percent) {
+                discountPercent = item.discount_percent;
+            } else if (originalPrice > 0 && currentPrice > 0) {
+                // Calculate discount percentage if not provided
+                discountPercent = Math.floor(((originalPrice - currentPrice) / originalPrice) * 100);
+            }
+            
+            // Fallback to random prices if backend data is missing
+            if (currentPrice === 0 || originalPrice === 0) {
+                currentPrice = Math.floor(Math.random() * 500) + 100;
+                originalPrice = Math.floor(currentPrice * (1 + Math.random() * 0.5));
+                discountPercent = Math.floor(((originalPrice - currentPrice) / originalPrice) * 100);
+            }
             
             return {
                 id: item.product_id || `catalog-${index}`,
                 title: item.title || `${item.category} - ${item.sub_category}`,
                 currentPrice: currentPrice,
-                originalPrice: Math.floor(originalPrice),
-                discount: `${discount}% off`,
+                originalPrice: originalPrice,
+                discount: `${discountPercent}% off`,
                 specialOffer: `₹${Math.floor(currentPrice * 0.9)} with ${Math.floor(Math.random() * 3) + 1} Special Offers`,
                 delivery: 'Free Delivery',
                 rating: (Math.random() * 2 + 3).toFixed(1), // Random rating between 3-5

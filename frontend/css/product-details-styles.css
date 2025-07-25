@@ -224,51 +224,7 @@ body {
     background: #9f2089;
 }
 
-/* Similar Products */
-.similar-products {
-    border-top: 1px solid #e0e0e0;
-    padding-top: 16px;
-}
 
-.similar-title {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: #333;
-}
-
-.similar-thumbnails {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.similar-thumbnails::-webkit-scrollbar {
-    display: none;
-}
-
-.similar-thumbnail {
-    flex-shrink: 0;
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: border-color 0.3s;
-}
-
-.similar-thumbnail.active {
-    border-color: #9f2089;
-}
-
-.thumbnail-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
 
 /* Product Information */
 .product-info {
@@ -452,21 +408,7 @@ body {
     color: #666;
 }
 
-.view-reviews-btn {
-    background: none;
-    border: 1px solid #9f2089;
-    color: #9f2089;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
 
-.view-reviews-btn:hover {
-    background: #9f2089;
-    color: white;
-}
 
 /* Action Buttons */
 .action-buttons {
