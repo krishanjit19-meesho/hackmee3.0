@@ -403,45 +403,15 @@ class MeeshoHome {
             return;
         }
 
-        try {
-            // Show loading state
-            const bannerImage = document.getElementById('bannerImage');
-            if (bannerImage) {
-                bannerImage.style.opacity = '0.7';
-                bannerImage.style.cursor = 'wait';
-            }
-
-            // Call the catalog API with user ID
-            const response = await fetch(`http://localhost:8080/api/v1/catalog/?user_id=${this.userData.userId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                // Store the catalog data in localStorage for the product listing page
-                localStorage.setItem('catalogData', JSON.stringify(result));
-                
-                // Redirect to product listing page
-                window.location.href = 'product-listing.html';
-            } else {
-                console.error('Failed to load catalog data:', result.error);
-                alert('Failed to load catalog data. Please try again.');
-            }
-        } catch (error) {
-            console.error('Error calling catalog API:', error);
-            alert('Network error. Please check your connection and try again.');
-        } finally {
-            // Reset banner state
-            const bannerImage = document.getElementById('bannerImage');
-            if (bannerImage) {
-                bannerImage.style.opacity = '1';
-                bannerImage.style.cursor = 'pointer';
-            }
+        // Show loading state on banner
+        const bannerImage = document.getElementById('bannerImage');
+        if (bannerImage) {
+            bannerImage.style.opacity = '0.7';
+            bannerImage.style.cursor = 'wait';
         }
+
+        // Redirect to loading page instead of calling API directly
+        window.location.href = 'loading.html';
     }
 
     handleNavigation(navItem) {

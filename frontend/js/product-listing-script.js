@@ -70,7 +70,7 @@ class ProductListing {
         this.showLoading(true);
         
         try {
-            // Get catalog data from localStorage (set by home page)
+            // Get catalog data from localStorage (set by loading page)
             const catalogDataString = localStorage.getItem('catalogData');
             
             if (catalogDataString) {
@@ -89,14 +89,16 @@ class ProductListing {
                     this.setPageTitle(this.PAGE_TITLES.DEFAULT);
                 }
             } else {
-                console.warn('No catalog data in localStorage, using mock data');
-                this.loadMockProducts();
-                this.setPageTitle(this.PAGE_TITLES.DEFAULT);
+                console.warn('No catalog data in localStorage, redirecting to loading page');
+                // If no catalog data, redirect to loading page
+                window.location.href = 'loading.html';
+                return;
             }
         } catch (error) {
             console.error('Error loading catalog data:', error);
-            this.loadMockProducts();
-            this.setPageTitle(this.PAGE_TITLES.DEFAULT);
+            // If error, redirect to loading page
+            window.location.href = 'loading.html';
+            return;
         }
 
         this.filteredProducts = [...this.products];
